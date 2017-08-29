@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Currency convertor</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="css/mobile.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div id="main">
+<h1>CURRENCY CONVERTER</h1>
+
+<div id="first">
+	<select id="prviSelect" name="prviSelect" onchange="getData().done(promenaKursa)">
+	  <option value="eur" id="e" selected>EUR</option>
+	  <option value="rsd" id="r">RSD</option>
+	  <option value="usd" id="u">USD</option>
+	</select>
+<input type="text" id="unosFirst" value="1" oninput="getData().done(promenaKursa)">
+</div>
+
+<img src="https://cdn4.iconfinder.com/data/icons/neutro-interface/32/switch-512.png" id="strele" >
+
+
+<div id="second">
+<select id="drugiSelect" name="drugiSelect" onchange="getData().done(promenaKursa)">
+	<option value="rsd1">RSD</option>
+	<option value="usd1" id="us" selected>USD</option>
+</select>
+<input type="text" id="unosDrugi">
+</div>
+
+<br><br>
+<p id="greska"></p><br>
+<button onclick="reset()" id="reset">Reset</button>
+</div>
+
+
+<script>
+var ddl = document.getElementById("prviSelect");
+ddl.addEventListener("change", promena);
+
+function getData() {
+    return $.ajax({
+        url : 'https://api.kursna-lista.info/b7b80a59415046c33449b6a2a96bd4d8/kursna_lista',
+        type: 'GET'
+    });
+}
+
+
+function promenaKursa(data){
+	console.log(data);
+	var srednjiKursEvra = data.result.eur.sre;
+	console.log(srednjiKursEvra);
+
+	var srednjiKursDolara = data.result.usd.sre;
+	console.log(srednjiKursDolara);
+
+
+
+	var ddl = document.getElementById("prviSelect");
+	var ddl2 = document.getElementById("drugiSelect");
+	var selectedValue = ddl.options[ddl.selectedIndex].value;
+	var selectedValue2 = ddl2.options[ddl2.selectedIndex].value;
+
+	var x = document.getElementById("unosFirst").value;
+	var y = document.getElementById("unosDrugi").value;
+	//y = x * 120.24;
+	//var z = y.toFixed(2);
+	//document.getElementById("unosDrugi").value = z;
+
+	if(isNaN(x)){
+		console.log("Not a number");
+		document.getElementById("unosDrugi").value = "";
+		document.getElementById("greska").innerHTML	 = "Please enter a number";
+		//document.getElementById("greska").style.color = "red";
+		document.getElementById("unosFirst").style.color = "red";
+	} 
+	else{
+		if(selectedValue =="eur" && selectedValue2 == "rsd1"){
+			//alert("gaja");
+			document.getElementById("unosDrugi").value = z;
+			y = x * srednjiKursEvra;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+		else if(selectedValue =="rsd" && selectedValue2 == "eur1"){
+			y = x / srednjiKursEvra;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+		else if(selectedValue =="usd" && selectedValue2 == "rsd1"){
+			y = x * srednjiKursDolara;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+		else if(selectedValue =="rsd" && selectedValue2 == "usd1"){
+			y = x / srednjiKursDolara;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+		else if(selectedValue =="eur" && selectedValue2 == "usd1"){
+			y = (x * srednjiKursEvra) / srednjiKursDolara;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+		else{
+			y = (x * srednjiKursDolara) / srednjiKursEvra;
+			var z = y.toFixed(2);
+			document.getElementById("unosDrugi").value = z;
+		}
+	}
+}
+
+function reset(){
+	document.getElementById("unosFirst").value = "1";
+    document.getElementById("unosDrugi").value = "";
+    document.getElementById("greska").innerHTML	 = "";
+    document.getElementById("unosFirst").style.color = "black";
+}
+
+
+function promena(){
+	var ddl = document.getElementById("prviSelect");
+	var ddl2 = document.getElementById("drugiSelect");
+	var selectedValue = ddl.options[ddl.selectedIndex].value;
+	var selectedValue2 = ddl2.options[ddl2.selectedIndex].value;
+
+	var x = document.getElementById("unosFirst").value;
+	var y = document.getElementById("unosDrugi").value;
+
+	if(selectedValue =="usd"){
+		$('#drugiSelect').empty()
+		$("#drugiSelect").append('<option value="eur1">EUR</option>');
+		$("#drugiSelect").append('<option value="rsd1">RSD</option>');
+	}
+	else if(selectedValue =="eur"){
+		$('#drugiSelect').empty()
+		$("#drugiSelect").append('<option value="usd1">USD</option>');
+		$("#drugiSelect").append('<option value="rsd1">RSD</option>');
+	}
+	else if (selectedValue =="rsd"){
+		$('#drugiSelect').empty() 
+		$("#drugiSelect").append('<option value="usd1">USD</option>');
+		$("#drugiSelect").append('<option value="eur1">EUR</option>');		
+	}
+}
+	
+/*$("#strele").click(function(e) {
+    e.preventDefault();
+    //Get the values
+    var fromVal = $("#prviSelect option:selected").val();
+    var fromText = $("#prviSelect option:selected").text();
+    var toVal = $("#drugiSelect option:selected").val();
+    var toText = $("#drugiSelect option:selected").text();
+    
+    //Set the values
+    $("#prviSelect option:selected").val(toVal);
+    $("#prviSelect option:selected").text(toText);
+    $("#drugiSelect:selected").val(fromVal);
+    $("#drugiSelect option:selected").text(fromText);
+
+
+	//$('#unosFirst').val([$('#unosDrugi').val(), 
+	//$('#unosDrugi').val($('#unosFirst').val())][0])
+});*/
+
+
+
+</script>
+
+<!--<script src="js/script.js"></script>-->
+</body>
+</html>
